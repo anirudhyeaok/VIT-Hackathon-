@@ -1,0 +1,135 @@
+{
+  "name": "GigWallet - Monthly Loan Rollover",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            { "mode": "custom", "cronExpression": "0 1 1 * *" }
+          ]
+        }
+      },
+      "name": "1st of Month 1AM",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "cron-monthly"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "id": "manual-trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/admin/loans",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "name": "Fetch All Loans",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 400],
+      "id": "fetch-loans"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Step 1: Find overdue loans → roll them over\n// Step 2: Find already rolled_over for 2+ months → block them\nconst now = new Date();\nconst twoMonthsMs = 60 * 24 * 60 * 60 * 1000;\nconst toRollOver = [];\nconst toBlock = [];\n\nconst loans = Array.isArray($input.all()) ? $input.all() : [$input.first()];\n\nfor (const item of loans) {\n  const loan = item.json;\n  const loansArray = Array.isArray(loan) ? loan : (loan.data ? loan.data : [loan]);\n  \n  for (const l of loansArray) {\n    const loanId = l.id || l._id;\n    \n    if (l.status === 'overdue') {\n      toRollOver.push({\n        loanId,\n        userId: l.userId,\n        action: 'roll_over',\n        newStatus: 'rolled_over'\n      });\n    }\n    \n    if (l.status === 'rolled_over' && l.rolledOverAt) {\n      const rolledAt = new Date(l.rolledOverAt);\n      if ((now.getTime() - rolledAt.getTime()) >= twoMonthsMs) {\n        toBlock.push({\n          loanId,\n          userId: l.userId,\n          action: 'block',\n          newStatus: 'blocked',\n          rolledOverSince: l.rolledOverAt\n        });\n      }\n    }\n  }\n}\n\nconst results = [];\nfor (const r of toRollOver) {\n  results.push({ json: r });\n}\nfor (const b of toBlock) {\n  results.push({ json: b });\n}\n\nif (results.length === 0) {\n  return [{ json: { noActions: true, message: 'No loans to roll over or block' } }];\n}\n\nreturn results;"
+      },
+      "name": "Process Rollovers",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 400],
+      "id": "process-rollovers"
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3000/admin/loans/{{$json.loanId}}/override",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: $json.newStatus }) }}",
+        "options": {}
+      },
+      "name": "Apply Status Override",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 400],
+      "id": "apply-override"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "Monthly rollover complete"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Log Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1250, 400],
+      "id": "log-results"
+    },
+    {
+      "parameters": {},
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1450, 400],
+      "id": "done"
+    }
+  ],
+  "connections": {
+    "1st of Month 1AM": {
+      "main": [
+        [{ "node": "Fetch All Loans", "type": "main", "index": 0 }]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [{ "node": "Fetch All Loans", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch All Loans": {
+      "main": [
+        [{ "node": "Process Rollovers", "type": "main", "index": 0 }]
+      ]
+    },
+    "Process Rollovers": {
+      "main": [
+        [{ "node": "Apply Status Override", "type": "main", "index": 0 }]
+      ]
+    },
+    "Apply Status Override": {
+      "main": [
+        [{ "node": "Log Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Log Results": {
+      "main": [
+        [{ "node": "Done", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    { "name": "gigwallet" },
+    { "name": "loans" }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-09-03T12:00:00.000Z",
+  "versionId": "1"
+}

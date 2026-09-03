@@ -1,0 +1,115 @@
+{
+  "name": "GigWallet - Platform Health Check",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            { "mode": "everyX", "value": 12, "unit": "hours" }
+          ]
+        }
+      },
+      "name": "Every 12 Hours",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "cron-12h"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "id": "manual-trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/admin/users",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "name": "Fetch All Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 400],
+      "id": "fetch-users"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Check each user's platform connections for staleness\nconst now = new Date();\nconst twentyFourHoursMs = 24 * 60 * 60 * 1000;\nconst seventyTwoHoursMs = 72 * 60 * 60 * 1000;\nconst results = [];\n\nconst items = Array.isArray($input.all()) ? $input.all() : [$input.first()];\n\nfor (const item of items) {\n  const data = item.json;\n  const users = Array.isArray(data) ? data : (data.data ? data.data : [data]);\n  \n  for (const user of users) {\n    const platforms = user.platforms || user.platformConnections || [];\n    \n    for (const platform of platforms) {\n      const lastSync = platform.lastSyncAt ? new Date(platform.lastSyncAt) : null;\n      \n      if (!lastSync) {\n        results.push({\n          json: {\n            userId: user.id || user._id,\n            platform: platform.name || platform.platform,\n            status: 'broken',\n            reason: 'Never synced',\n            lastSyncAt: null\n          }\n        });\n        continue;\n      }\n      \n      const timeSinceSync = now.getTime() - lastSync.getTime();\n      \n      if (timeSinceSync > seventyTwoHoursMs) {\n        results.push({\n          json: {\n            userId: user.id || user._id,\n            platform: platform.name || platform.platform,\n            status: 'broken',\n            reason: 'No sync for 72+ hours',\n            lastSyncAt: platform.lastSyncAt,\n            hoursSinceSync: Math.floor(timeSinceSync / (60 * 60 * 1000))\n          }\n        });\n      } else if (timeSinceSync > twentyFourHoursMs) {\n        results.push({\n          json: {\n            userId: user.id || user._id,\n            platform: platform.name || platform.platform,\n            status: 'stale',\n            reason: 'No sync for 24+ hours',\n            lastSyncAt: platform.lastSyncAt,\n            hoursSinceSync: Math.floor(timeSinceSync / (60 * 60 * 1000))\n          }\n        });\n      }\n    }\n  }\n}\n\nif (results.length === 0) {\n  return [{ json: { allHealthy: true, message: 'All platform connections are healthy', checkedAt: now.toISOString() } }];\n}\n\nreturn results;"
+      },
+      "name": "Check Platform Health",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 400],
+      "id": "check-health"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "report",
+              "value": "=Platform health check complete. Issues: {{$json.allHealthy ? '0' : 'see results'}}"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Log Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1000, 400],
+      "id": "log-results"
+    },
+    {
+      "parameters": {},
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1200, 400],
+      "id": "done"
+    }
+  ],
+  "connections": {
+    "Every 12 Hours": {
+      "main": [
+        [{ "node": "Fetch All Users", "type": "main", "index": 0 }]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [{ "node": "Fetch All Users", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch All Users": {
+      "main": [
+        [{ "node": "Check Platform Health", "type": "main", "index": 0 }]
+      ]
+    },
+    "Check Platform Health": {
+      "main": [
+        [{ "node": "Log Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Log Results": {
+      "main": [
+        [{ "node": "Done", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    { "name": "gigwallet" },
+    { "name": "monitoring" }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-09-03T12:00:00.000Z",
+  "versionId": "1"
+}

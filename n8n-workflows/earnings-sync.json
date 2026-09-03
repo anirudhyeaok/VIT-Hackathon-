@@ -1,0 +1,199 @@
+{
+  "name": "GigWallet - Earnings Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            { "mode": "everyX", "value": 6, "unit": "hours" }
+          ]
+        }
+      },
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "cron-trigger"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "id": "manual-trigger"
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3001/zomato/earnings/ZMT-R-1001?date={{$now.format('yyyy-MM-dd')}}",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "name": "Fetch Zomato Earnings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 200],
+      "id": "fetch-zomato"
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3001/swiggy/earnings/SWG-R-2001?date={{$now.format('yyyy-MM-dd')}}",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "name": "Fetch Swiggy Earnings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 350],
+      "id": "fetch-swiggy"
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3001/uber/earnings/UBR-R-3001?date={{$now.format('yyyy-MM-dd')}}",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "name": "Fetch Uber Earnings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 500],
+      "id": "fetch-uber"
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3001/ola/earnings/OLA-P-4001?date={{$now.format('yyyy-MM-dd')}}",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "name": "Fetch Ola Earnings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 650],
+      "id": "fetch-ola"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Merge all platform earnings into a single array\nconst zomato = $items('Fetch Zomato Earnings');\nconst swiggy = $items('Fetch Swiggy Earnings');\nconst uber = $items('Fetch Uber Earnings');\nconst ola = $items('Fetch Ola Earnings');\n\nconst allEarnings = [];\n\nfor (const item of zomato) {\n  allEarnings.push({ json: { ...item.json, source: 'zomato' } });\n}\nfor (const item of swiggy) {\n  allEarnings.push({ json: { ...item.json, source: 'swiggy' } });\n}\nfor (const item of uber) {\n  allEarnings.push({ json: { ...item.json, source: 'uber' } });\n}\nfor (const item of ola) {\n  allEarnings.push({ json: { ...item.json, source: 'ola' } });\n}\n\nreturn allEarnings;"
+      },
+      "name": "Merge Earnings",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 400],
+      "id": "merge-earnings"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/webhooks/n8n/earnings-sync",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": []
+        },
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "name": "POST Earnings to Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 400],
+      "id": "post-earnings"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "Earnings sync complete"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Log Complete",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1250, 400],
+      "id": "log-complete"
+    },
+    {
+      "parameters": {},
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1450, 400],
+      "id": "done"
+    }
+  ],
+  "connections": {
+    "Cron Trigger": {
+      "main": [
+        [
+          { "node": "Fetch Zomato Earnings", "type": "main", "index": 0 },
+          { "node": "Fetch Swiggy Earnings", "type": "main", "index": 0 },
+          { "node": "Fetch Uber Earnings", "type": "main", "index": 0 },
+          { "node": "Fetch Ola Earnings", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [
+          { "node": "Fetch Zomato Earnings", "type": "main", "index": 0 },
+          { "node": "Fetch Swiggy Earnings", "type": "main", "index": 0 },
+          { "node": "Fetch Uber Earnings", "type": "main", "index": 0 },
+          { "node": "Fetch Ola Earnings", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch Zomato Earnings": {
+      "main": [
+        [{ "node": "Merge Earnings", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Swiggy Earnings": {
+      "main": [
+        [{ "node": "Merge Earnings", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Uber Earnings": {
+      "main": [
+        [{ "node": "Merge Earnings", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Ola Earnings": {
+      "main": [
+        [{ "node": "Merge Earnings", "type": "main", "index": 0 }]
+      ]
+    },
+    "Merge Earnings": {
+      "main": [
+        [{ "node": "POST Earnings to Backend", "type": "main", "index": 0 }]
+      ]
+    },
+    "POST Earnings to Backend": {
+      "main": [
+        [{ "node": "Log Complete", "type": "main", "index": 0 }]
+      ]
+    },
+    "Log Complete": {
+      "main": [
+        [{ "node": "Done", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    { "name": "gigwallet" },
+    { "name": "earnings" }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-09-03T12:00:00.000Z",
+  "versionId": "1"
+}

@@ -1,0 +1,190 @@
+// GigWallet — Prisma Schema
+// Financial Resilience Platform for Gig & Informal Workers
+// Database: SQLite (zero-setup for hackathon)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./gigwallet.db"
+}
+
+// ─── USER & AUTH ───────────────────────────────────────────
+
+model User {
+  id              String   @id @default(uuid())
+  name            String
+  email           String   @unique
+  password        String   // hashed, normal login (no OTP)
+  phone           String?
+  occupation      String   // delivery_partner | ride_hailing | freelancer | informal
+  incomeFrequency String   @default("daily") // daily | weekly | biweekly | monthly | irregular
+  emergencyBuffer Float    @default(5000) // user's target emergency fund (₹)
+  status          String   @default("active") // active | blocked
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  platformConnections PlatformConnection[]
+  earningsHistory     EarningsRecord[]
+  transactions        Transaction[]
+  loans               Loan[]
+  recommendations     Recommendation[]
+  resilienceScores    ResilienceScore[]
+  alerts              Alert[]
+}
+
+// ─── MULTI-PLATFORM GIG CONNECTIONS ────────────────────────
+// KEY DIFFERENTIATOR: Users can link MULTIPLE gig apps
+
+model PlatformConnection {
+  id           String   @id @default(uuid())
+  userId       String
+  platform     String   // zomato | swiggy | uber | ola | custom
+  platformName String   // Display name: "Zomato", "Swiggy", etc.
+  accountId    String?  // User's ID on that platform
+  authToken    String?  // OAuth or API token (mock for hackathon)
+  status       String   @default("linked") // linked | stale | broken
+  lastSyncAt   DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user            User             @relation(fields: [userId], references: [id])
+  earningsRecords EarningsRecord[]
+
+  @@unique([userId, platform])
+}
+
+// ─── EARNINGS FROM GIG PLATFORMS ───────────────────────────
+// Per-platform, per-day earnings records for cross-platform analysis
+
+model EarningsRecord {
+  id           String   @id @default(uuid())
+  userId       String
+  connectionId String
+  platform     String   // zomato | swiggy | uber | ola
+  date         DateTime // the day these earnings are for
+  amount       Float    // total earnings that day (₹)
+  trips        Int      @default(0) // deliveries/rides completed
+  hoursWorked  Float    @default(0) // hours active on platform
+  incentives   Float    @default(0) // bonuses, surge, tips
+  rating       Float?   // user's rating that day (if available)
+  createdAt    DateTime @default(now())
+
+  user       User               @relation(fields: [userId], references: [id])
+  connection PlatformConnection @relation(fields: [connectionId], references: [id])
+
+  @@unique([connectionId, date])
+}
+
+// ─── TRANSACTIONS (Income + Expenses) ──────────────────────
+// Unified transaction log for financial analysis
+
+model Transaction {
+  id        String   @id @default(uuid())
+  userId    String
+  amount    Float
+  type      String   // income | expense
+  category  String   // For income: platform_earning | freelance | other
+                     // For expense: food | rent | fuel | vehicle_maintenance |
+                     //   utilities | medicine | education | internet | equipment |
+                     //   entertainment | shopping | dining | emi | other
+  source    String?  // e.g., "zomato", "swiggy", "manual_entry", "bank_sync"
+  note      String?
+  date      DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─── LOANS (Earned Wage Access + Micro-credit) ─────────────
+// Deferred repayment model: 5-day grace → reminders → rollover → block
+
+model Loan {
+  id             String    @id @default(uuid())
+  userId         String
+  principal      Float     // amount borrowed (₹)
+  interestRate   Float     @default(0) // for hackathon, 0% or nominal
+  totalDue       Float     // principal + interest
+  amountRepaid   Float     @default(0)
+  status         String    @default("disbursed")
+  // Status flow: disbursed → grace_period → overdue → rolled_over → blocked → repaid
+  riskLevel      String    // safe | caution | high_risk (assessed at request time)
+  disbursedAt    DateTime  @default(now())
+  graceDeadline  DateTime  // disbursedAt + 5 days
+  overdueAt      DateTime? // when it became overdue
+  rolledOverAt   DateTime? // when it was rolled into next cycle
+  repaidAt       DateTime? // when fully repaid
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user       User            @relation(fields: [userId], references: [id])
+  repayments LoanRepayment[]
+}
+
+model LoanRepayment {
+  id        String   @id @default(uuid())
+  loanId    String
+  amount    Float
+  method    String   @default("manual") // manual | auto_deduct | upi
+  paidAt    DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  loan Loan @relation(fields: [loanId], references: [id])
+}
+
+// ─── FINANCIAL RESILIENCE SCORE ────────────────────────────
+// Explainable score: 0-100 with component breakdown
+
+model ResilienceScore {
+  id                    String   @id @default(uuid())
+  userId                String
+  overallScore          Float    // 0-100
+  emergencyBufferScore  Float    // 0-30 (30% weight)
+  incomeStabilityScore  Float    // 0-20 (20% weight)
+  expenseStabilityScore Float    // 0-15 (15% weight)
+  debtBurdenScore       Float    // 0-20 (20% weight)
+  savingsBehaviourScore Float    // 0-15 (15% weight)
+  // Cross-platform consistency bonus (our differentiator)
+  platformConsistency   Float    @default(0) // bonus points for multi-platform consistency
+  explanation           String   // human-readable explanation of the score
+  calculatedAt          DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─── AI RECOMMENDATIONS ────────────────────────────────────
+// Contextual, explainable financial guidance
+
+model Recommendation {
+  id         String   @id @default(uuid())
+  userId     String
+  type       String   // savings | credit | spending | emergency | general
+  action     String   // save | spend | borrow | wait | reduce_spending | build_buffer
+  amount     Float?   // recommended amount (₹), if applicable
+  riskLevel  String?  // safe | caution | high_risk
+  title      String   // short title: "Save ₹500 this week"
+  reason     String   // why: "Your income increased by 18%..."
+  consequence String? // what happens if ignored
+  priority   Int      @default(0) // higher = more important
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─── FINANCIAL ALERTS ──────────────────────────────────────
+
+model Alert {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String   // income_alert | spending_alert | debt_alert | savings_alert | platform_alert
+  severity  String   // info | warning | critical
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}

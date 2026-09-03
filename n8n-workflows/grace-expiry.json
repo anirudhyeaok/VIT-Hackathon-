@@ -1,0 +1,135 @@
+{
+  "name": "GigWallet - Grace Period Expiry Check",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            { "mode": "everyDay", "hour": 0, "minute": 0 }
+          ]
+        }
+      },
+      "name": "Midnight Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "cron-midnight"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "id": "manual-trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/admin/loans",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "name": "Fetch All Loans",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 400],
+      "id": "fetch-loans"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Find loans where status='grace_period' AND graceDeadline has passed\nconst now = new Date();\nconst results = [];\n\nconst loans = Array.isArray($input.all()) ? $input.all() : [$input.first()];\n\nfor (const item of loans) {\n  const loan = item.json;\n  const loansArray = Array.isArray(loan) ? loan : (loan.data ? loan.data : [loan]);\n  \n  for (const l of loansArray) {\n    if (l.status === 'grace_period' && l.graceDeadline) {\n      const deadline = new Date(l.graceDeadline);\n      \n      if (deadline < now) {\n        results.push({\n          json: {\n            loanId: l.id || l._id,\n            userId: l.userId,\n            graceDeadline: l.graceDeadline,\n            expiredSince: Math.floor((now.getTime() - deadline.getTime()) / (24 * 60 * 60 * 1000)),\n            newStatus: 'overdue'\n          }\n        });\n      }\n    }\n  }\n}\n\nif (results.length === 0) {\n  return [{ json: { noExpired: true, message: 'No expired grace periods found' } }];\n}\n\nreturn results;"
+      },
+      "name": "Find Expired Grace Periods",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 400],
+      "id": "find-expired"
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3000/admin/loans/{{$json.loanId}}/override",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ status: 'overdue' }) }}",
+        "options": {}
+      },
+      "name": "Override to Overdue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 400],
+      "id": "override-overdue"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "=Grace expiry check complete. Processed expired loans."
+            },
+            {
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Log Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1250, 400],
+      "id": "log-results"
+    },
+    {
+      "parameters": {},
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1450, 400],
+      "id": "done"
+    }
+  ],
+  "connections": {
+    "Midnight Trigger": {
+      "main": [
+        [{ "node": "Fetch All Loans", "type": "main", "index": 0 }]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [{ "node": "Fetch All Loans", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch All Loans": {
+      "main": [
+        [{ "node": "Find Expired Grace Periods", "type": "main", "index": 0 }]
+      ]
+    },
+    "Find Expired Grace Periods": {
+      "main": [
+        [{ "node": "Override to Overdue", "type": "main", "index": 0 }]
+      ]
+    },
+    "Override to Overdue": {
+      "main": [
+        [{ "node": "Log Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Log Results": {
+      "main": [
+        [{ "node": "Done", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    { "name": "gigwallet" },
+    { "name": "loans" }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-09-03T12:00:00.000Z",
+  "versionId": "1"
+}

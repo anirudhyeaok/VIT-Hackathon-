@@ -1,0 +1,135 @@
+{
+  "name": "GigWallet - Repayment Reminder",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            { "mode": "everyDay", "hour": 9, "minute": 0 }
+          ]
+        }
+      },
+      "name": "Daily 9AM Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "cron-daily-9am"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "id": "manual-trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/admin/loans",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "name": "Fetch All Loans",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 400],
+      "id": "fetch-loans"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Filter loans in grace_period where graceDeadline is within 3 days\nconst now = new Date();\nconst threeDaysMs = 3 * 24 * 60 * 60 * 1000;\nconst results = [];\n\nconst loans = Array.isArray($input.all()) ? $input.all() : [$input.first()];\n\nfor (const item of loans) {\n  const loan = item.json;\n  \n  // Handle both array response and individual items\n  const loansArray = Array.isArray(loan) ? loan : (loan.data ? loan.data : [loan]);\n  \n  for (const l of loansArray) {\n    if (l.status === 'grace_period' && l.graceDeadline) {\n      const deadline = new Date(l.graceDeadline);\n      const timeUntilDeadline = deadline.getTime() - now.getTime();\n      \n      if (timeUntilDeadline > 0 && timeUntilDeadline <= threeDaysMs) {\n        results.push({\n          json: {\n            loanId: l.id || l._id,\n            userId: l.userId,\n            graceDeadline: l.graceDeadline,\n            daysRemaining: Math.ceil(timeUntilDeadline / (24 * 60 * 60 * 1000)),\n            outstandingAmount: l.outstandingAmount || l.amount\n          }\n        });\n      }\n    }\n  }\n}\n\nif (results.length === 0) {\n  return [{ json: { noReminders: true, message: 'No loans approaching grace deadline' } }];\n}\n\nreturn results;"
+      },
+      "name": "Filter Grace Period Loans",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 400],
+      "id": "filter-grace-loans"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/webhooks/n8n/loan-reminder",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ loanId: $json.loanId, userId: $json.userId, daysRemaining: $json.daysRemaining, outstandingAmount: $json.outstandingAmount }) }}",
+        "options": {}
+      },
+      "name": "Send Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 400],
+      "id": "send-reminder"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "=Sent repayment reminders"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Log Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1250, 400],
+      "id": "log-results"
+    },
+    {
+      "parameters": {},
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1450, 400],
+      "id": "done"
+    }
+  ],
+  "connections": {
+    "Daily 9AM Trigger": {
+      "main": [
+        [{ "node": "Fetch All Loans", "type": "main", "index": 0 }]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [{ "node": "Fetch All Loans", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch All Loans": {
+      "main": [
+        [{ "node": "Filter Grace Period Loans", "type": "main", "index": 0 }]
+      ]
+    },
+    "Filter Grace Period Loans": {
+      "main": [
+        [{ "node": "Send Reminder", "type": "main", "index": 0 }]
+      ]
+    },
+    "Send Reminder": {
+      "main": [
+        [{ "node": "Log Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Log Results": {
+      "main": [
+        [{ "node": "Done", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    { "name": "gigwallet" },
+    { "name": "loans" }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-09-03T12:00:00.000Z",
+  "versionId": "1"
+}

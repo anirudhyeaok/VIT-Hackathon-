@@ -1,0 +1,14 @@
+{
+  "name": "gigwallet-mock-platforms",
+  "version": "1.0.0",
+  "description": "Mock gig platform APIs for GigWallet development and demos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

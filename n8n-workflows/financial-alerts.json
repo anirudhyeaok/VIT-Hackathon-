@@ -1,0 +1,191 @@
+{
+  "name": "GigWallet - Financial Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            { "mode": "everyDay", "hour": 8, "minute": 0 }
+          ]
+        }
+      },
+      "name": "Daily 8AM Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "id": "cron-daily-8am"
+    },
+    {
+      "parameters": {},
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "id": "manual-trigger"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/admin/users",
+        "responseFormat": "json",
+        "options": {}
+      },
+      "name": "Fetch All Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [500, 400],
+      "id": "fetch-users"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract user IDs for subsequent earnings lookups\nconst items = Array.isArray($input.all()) ? $input.all() : [$input.first()];\nconst users = [];\n\nfor (const item of items) {\n  const data = item.json;\n  const usersArray = Array.isArray(data) ? data : (data.data ? data.data : [data]);\n  \n  for (const u of usersArray) {\n    users.push({\n      json: {\n        userId: u.id || u._id,\n        name: u.name,\n        phone: u.phone\n      }\n    });\n  }\n}\n\nif (users.length === 0) {\n  return [{ json: { noUsers: true, message: 'No users found' } }];\n}\n\nreturn users;"
+      },
+      "name": "Extract User IDs",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [750, 400],
+      "id": "extract-users"
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3000/earnings/{{$json.userId}}/summary",
+        "responseFormat": "json",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "name": "Fetch Earnings Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 300],
+      "id": "fetch-earnings"
+    },
+    {
+      "parameters": {
+        "url": "=http://localhost:3000/earnings/{{$json.userId}}/forecast",
+        "responseFormat": "json",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "name": "Fetch Forecast",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1000, 500],
+      "id": "fetch-forecast"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Analyze earnings and forecast data for alert conditions\nconst alerts = [];\nconst items = $input.all();\n\nfor (const item of items) {\n  const data = item.json;\n  const userId = data.userId;\n  \n  // Alert: Income drop (current week vs previous week > 30% drop)\n  if (data.currentWeekEarnings !== undefined && data.previousWeekEarnings !== undefined) {\n    const prevWeek = data.previousWeekEarnings;\n    const currWeek = data.currentWeekEarnings;\n    \n    if (prevWeek > 0) {\n      const dropPercent = ((prevWeek - currWeek) / prevWeek) * 100;\n      if (dropPercent > 30) {\n        alerts.push({\n          json: {\n            userId,\n            type: 'income_drop',\n            severity: dropPercent > 50 ? 'critical' : 'warning',\n            title: 'Income Drop Detected',\n            message: `Your income dropped ${Math.round(dropPercent)}% compared to last week`,\n            data: { currentWeek: currWeek, previousWeek: prevWeek, dropPercent: Math.round(dropPercent) }\n          }\n        });\n      }\n    }\n  }\n  \n  // Alert: Low buffer (predicted income < expenses)\n  if (data.forecastedMonthlyIncome !== undefined && data.estimatedExpenses !== undefined) {\n    const buffer = data.forecastedMonthlyIncome - data.estimatedExpenses;\n    if (buffer < 2000) {\n      alerts.push({\n        json: {\n          userId,\n          type: 'buffer_low',\n          severity: buffer < 0 ? 'critical' : 'warning',\n          title: 'Low Financial Buffer',\n          message: buffer < 0 \n            ? `Projected shortfall of ₹${Math.abs(Math.round(buffer))} this month` \n            : `Financial buffer is only ₹${Math.round(buffer)} this month`,\n          data: { forecastedIncome: data.forecastedMonthlyIncome, expenses: data.estimatedExpenses, buffer: Math.round(buffer) }\n        }\n      });\n    }\n  }\n  \n  // Alert: Expense spike\n  if (data.currentMonthExpenses !== undefined && data.averageMonthlyExpenses !== undefined) {\n    const avgExpenses = data.averageMonthlyExpenses;\n    const currExpenses = data.currentMonthExpenses;\n    \n    if (avgExpenses > 0) {\n      const spikePercent = ((currExpenses - avgExpenses) / avgExpenses) * 100;\n      if (spikePercent > 25) {\n        alerts.push({\n          json: {\n            userId,\n            type: 'expense_spike',\n            severity: spikePercent > 50 ? 'critical' : 'warning',\n            title: 'Expense Spike Detected',\n            message: `Your expenses are ${Math.round(spikePercent)}% higher than your average`,\n            data: { currentExpenses: currExpenses, averageExpenses: avgExpenses, spikePercent: Math.round(spikePercent) }\n          }\n        });\n      }\n    }\n  }\n}\n\nif (alerts.length === 0) {\n  return [{ json: { noAlerts: true, message: 'No financial alerts generated', checkedAt: new Date().toISOString() } }];\n}\n\nreturn alerts;"
+      },
+      "name": "Generate Alerts",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1250, 400],
+      "id": "generate-alerts"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/webhooks/n8n/financial-alert",
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "name": "POST Alerts to Backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1500, 400],
+      "id": "post-alerts"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "Financial alerts generation complete"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{$now.toISO()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Log Results",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1750, 400],
+      "id": "log-results"
+    },
+    {
+      "parameters": {},
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1950, 400],
+      "id": "done"
+    }
+  ],
+  "connections": {
+    "Daily 8AM Trigger": {
+      "main": [
+        [{ "node": "Fetch All Users", "type": "main", "index": 0 }]
+      ]
+    },
+    "Manual Trigger": {
+      "main": [
+        [{ "node": "Fetch All Users", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch All Users": {
+      "main": [
+        [{ "node": "Extract User IDs", "type": "main", "index": 0 }]
+      ]
+    },
+    "Extract User IDs": {
+      "main": [
+        [
+          { "node": "Fetch Earnings Summary", "type": "main", "index": 0 },
+          { "node": "Fetch Forecast", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch Earnings Summary": {
+      "main": [
+        [{ "node": "Generate Alerts", "type": "main", "index": 0 }]
+      ]
+    },
+    "Fetch Forecast": {
+      "main": [
+        [{ "node": "Generate Alerts", "type": "main", "index": 0 }]
+      ]
+    },
+    "Generate Alerts": {
+      "main": [
+        [{ "node": "POST Alerts to Backend", "type": "main", "index": 0 }]
+      ]
+    },
+    "POST Alerts to Backend": {
+      "main": [
+        [{ "node": "Log Results", "type": "main", "index": 0 }]
+      ]
+    },
+    "Log Results": {
+      "main": [
+        [{ "node": "Done", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {},
+  "staticData": null,
+  "tags": [
+    { "name": "gigwallet" },
+    { "name": "alerts" }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-09-03T12:00:00.000Z",
+  "versionId": "1"
+}
