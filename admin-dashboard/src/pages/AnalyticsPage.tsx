@@ -20,7 +20,7 @@ const AnalyticsPage = () => {
       });
   }, [addToast]);
 
-  if (loading) return (
+  if (loading || !data || !data.usability) return (
     <div className="space-y-4 max-w-7xl mx-auto pb-10">
       <div className="h-6 bg-[#F0F1EC] rounded animate-pulse w-48 mb-4"></div>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

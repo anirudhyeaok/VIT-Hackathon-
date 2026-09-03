@@ -25,6 +25,7 @@ function App() {
               <Route path="/admin/analytics" element={<AnalyticsPage />} />
               <Route path="/admin/consents" element={<ConsentsPage />} />
               <Route path="/admin/workflows" element={<WorkflowsPage />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
             </Routes>
           </main>
         </div>
