@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, CreditCard, IndianRupee, Activity, ArrowUpRight, ShieldCheck, Timer, ExternalLink } from 'lucide-react';
+import { Users, CreditCard, IndianRupee, Activity, ArrowRight, ShieldCheck, Timer, ExternalLink } from 'lucide-react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import StatCard from '../components/StatCard';
 import StatusBadge from '../components/StatusBadge';
@@ -10,183 +10,187 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 300);
+    const timer = setTimeout(() => setLoading(false), 200);
     return () => clearTimeout(timer);
   }, []);
 
+  // Restrained professional financial palette: muted green, olive, warm gray, charcoal, muted amber, muted red
   const loanStatusData = [
-    { name: 'Grace Period (5 Days)', value: 420, color: '#F59E0B' },
-    { name: 'Overdue (Late)', value: 110, color: '#EF4444' },
-    { name: 'Rolled Over (Next Cycle)', value: 75, color: '#8B5CF6' },
-    { name: 'Repaid in Full', value: 890, color: '#10B981' },
+    { name: 'Grace Period (5 Days)', value: 420, color: '#A78655' },
+    { name: 'Overdue', value: 110, color: '#A96861' },
+    { name: 'Rolled Over', value: 75, color: '#7C8768' },
+    { name: 'Repaid in Full', value: 890, color: '#62806A' },
   ];
 
   const platformData = [
-    { name: 'Zomato', users: 480, fill: '#E23744' },
-    { name: 'Swiggy', users: 510, fill: '#FC8019' },
-    { name: 'Uber', users: 390, fill: '#1E293B' },
-    { name: 'Ola', users: 320, fill: '#16A34A' },
+    { name: 'Zomato', users: 480, fill: '#5F7563' },
+    { name: 'Swiggy', users: 510, fill: '#7C8768' },
+    { name: 'Uber', users: 390, fill: '#8A8F89' },
+    { name: 'Ola', users: 320, fill: '#A3AD94' },
   ];
 
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* Hero Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 p-8 text-white shadow-xl border border-slate-800">
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              VIT Hackathon 2026 • Financial Resilience Platform
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      {/* Clean White Financial Header Banner */}
+      <div className="rounded-xl bg-white p-7 border border-[#DCDDD7] shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          <div className="space-y-1.5 max-w-2xl">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#E9EFEA] border border-[#DCDDD7] text-[#526A57] text-xs font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#5F7563]" />
+              Financial Resilience Platform • Operations Overview
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-white">
-              Multi-Platform Co-Pilot for Gig Workers
+            <h1 className="text-2xl font-bold tracking-tight text-[#30332F]">
+              Gig Workforce Resilience & Portfolio Operations
             </h1>
-            <p className="text-slate-300 text-sm leading-relaxed">
-              Evaluating holistic income consistency across <strong>Zomato, Swiggy, Uber, and Ola</strong>.
-              Featuring our borrower-friendly <strong>5-day deferred loan recovery</strong> instead of immediate salary deductions.
+            <p className="text-[#6B706A] text-xs sm:text-sm leading-relaxed">
+              Cross-platform earnings aggregation across Zomato, Swiggy, Uber, and Ola. 
+              Governed by a 5-day deferred loan recovery buffer to protect worker cash-flow continuity.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <Link
               to="/admin/workflows"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold shadow-lg shadow-indigo-600/30 transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#5F7563] hover:bg-[#4D6151] text-white text-xs font-semibold transition-colors border border-[#4D6151]"
             >
-              <span>View n8n Pipelines</span>
-              <ArrowUpRight className="w-4 h-4" />
+              <span>Automated Workflows</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
             <Link
               to="/admin/loans"
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-sm font-semibold border border-slate-700 transition-all"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white hover:bg-[#F0F1EC] text-[#30332F] text-xs font-medium border border-[#DCDDD7] transition-colors"
             >
-              <span>Recovery Funnel</span>
+              <span>Loan Pipeline</span>
             </Link>
           </div>
         </div>
-
-        {/* Decorative background glow */}
-        <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
       </div>
 
       {/* KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <StatCard title="Active Gig Workers" value="1,245" icon={<Users />} trend={{ value: 18, isPositive: true }} />
-        <StatCard title="Active EWA Loans" value="420 in Grace" icon={<CreditCard />} trend={{ value: 5, isPositive: true }} />
-        <StatCard title="Total Disbursed" value="₹ 45.2 Lakh" icon={<IndianRupee />} trend={{ value: 12, isPositive: true }} />
-        <StatCard title="Avg Resilience Score" value="72 / 100" icon={<Activity />} trend={{ value: 4, isPositive: true }} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard title="Active Gig Workers" value="1,245" icon={<Users size={18} />} trend={{ value: 18, isPositive: true }} />
+        <StatCard title="Active EWA Loans" value="420" icon={<CreditCard size={18} />} trend={{ value: 5, isPositive: true }} />
+        <StatCard title="Total Disbursed" value="₹ 45.2 Lakh" icon={<IndianRupee size={18} />} trend={{ value: 12, isPositive: true }} />
+        <StatCard title="Avg Resilience Score" value="72 / 100" icon={<Activity size={18} />} trend={{ value: 4, isPositive: true }} />
       </div>
 
       {/* HERO Differentiator Banner: Deferred Recovery Flow */}
-      <div className="bg-gradient-to-br from-amber-500/5 via-white to-amber-500/10 rounded-2xl border border-amber-200/80 p-6 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 bg-amber-100 text-amber-700 rounded-xl">
-              <Timer className="w-6 h-6" />
+      <div className="bg-white rounded-xl border border-[#DCDDD7] p-6 shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
+          <div className="flex items-center gap-2.5">
+            <span className="p-2 bg-[#F0F1EC] text-[#5F7563] rounded-lg border border-[#DCDDD7]">
+              <Timer className="w-5 h-5" />
             </span>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Borrower-First Deferred Loan Recovery Model</h2>
-              <p className="text-xs text-slate-500">
-                Unlike KarmaLife which immediately seizes loan repayments from salary deposits, GigWallet gives workers a 5-day grace window.
+              <h2 className="text-sm font-bold text-[#30332F]">5-Stage Deferred Loan Recovery Model</h2>
+              <p className="text-xs text-[#6B706A]">
+                Structured repayment window: Earnings are credited in full with an initial 5-day grace buffer before escalation.
               </p>
             </div>
           </div>
           <Link
             to="/admin/loans"
-            className="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1 shrink-0"
+            className="text-xs font-semibold text-[#526A57] hover:text-[#38463B] flex items-center gap-1 shrink-0"
           >
-            Inspect Active Pipeline <ExternalLink className="w-3.5 h-3.5" />
+            Review Active Cohort <ExternalLink className="w-3 h-3" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
-          <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Stage 1</span>
-            <div className="text-sm font-bold text-slate-900 mt-1">Salary Deposited</div>
-            <p className="text-[11px] text-slate-500 mt-0.5">Worker gets 100% of wage</p>
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-2.5">
+          <div className="p-3 bg-[#F9F9F7] rounded-lg border border-[#DCDDD7]">
+            <span className="text-[10px] font-semibold text-[#8A8F89] uppercase tracking-wider">Stage 1</span>
+            <div className="text-xs font-bold text-[#30332F] mt-1">Salary Deposited</div>
+            <p className="text-[11px] text-[#6B706A] mt-0.5">Worker receives 100% of payout</p>
           </div>
-          <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-200/80 shadow-xs ring-2 ring-amber-400/30">
-            <span className="text-[10px] font-bold text-amber-700 uppercase">Stage 2 (Active)</span>
-            <div className="text-sm font-bold text-amber-900 mt-1">5-Day Grace Period</div>
-            <p className="text-[11px] text-amber-700 mt-0.5">Zero auto-debit deduction</p>
+          <div className="p-3 bg-[#E9EFEA] rounded-lg border border-[#5F7563]/40">
+            <span className="text-[10px] font-semibold text-[#526A57] uppercase tracking-wider">Stage 2 (Active)</span>
+            <div className="text-xs font-bold text-[#30332F] mt-1">5-Day Grace Period</div>
+            <p className="text-[11px] text-[#526A57] mt-0.5">No automatic deduction</p>
           </div>
-          <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Stage 3</span>
-            <div className="text-sm font-bold text-slate-900 mt-1">Day 3 & 5 Alerts</div>
-            <p className="text-[11px] text-slate-500 mt-0.5">Gentle WhatsApp / SMS prompt</p>
+          <div className="p-3 bg-[#F9F9F7] rounded-lg border border-[#DCDDD7]">
+            <span className="text-[10px] font-semibold text-[#8A8F89] uppercase tracking-wider">Stage 3</span>
+            <div className="text-xs font-bold text-[#30332F] mt-1">Day 3 & 5 Prompts</div>
+            <p className="text-[11px] text-[#6B706A] mt-0.5">Polite SMS / WhatsApp reminder</p>
           </div>
-          <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Stage 4</span>
-            <div className="text-sm font-bold text-slate-900 mt-1">Monthly Rollover</div>
-            <p className="text-[11px] text-slate-500 mt-0.5">Rolled into next month</p>
+          <div className="p-3 bg-[#F9F9F7] rounded-lg border border-[#DCDDD7]">
+            <span className="text-[10px] font-semibold text-[#8A8F89] uppercase tracking-wider">Stage 4</span>
+            <div className="text-xs font-bold text-[#30332F] mt-1">Monthly Rollover</div>
+            <p className="text-[11px] text-[#6B706A] mt-0.5">Rolled into next monthly cycle</p>
           </div>
-          <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
-            <span className="text-[10px] font-bold text-slate-400 uppercase">Stage 5</span>
-            <div className="text-sm font-bold text-slate-900 mt-1">Fair Escalation</div>
-            <p className="text-[11px] text-slate-500 mt-0.5">Blocked only if unpaid 2x</p>
+          <div className="p-3 bg-[#F9F9F7] rounded-lg border border-[#DCDDD7]">
+            <span className="text-[10px] font-semibold text-[#8A8F89] uppercase tracking-wider">Stage 5</span>
+            <div className="text-xs font-bold text-[#30332F] mt-1">Account Restriction</div>
+            <p className="text-[11px] text-[#6B706A] mt-0.5">Blocked only if unpaid 2 cycles</p>
           </div>
         </div>
       </div>
 
       {/* Main Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Left Chart: Loan Pipeline Status */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+        <div className="bg-white p-5 rounded-xl border border-[#DCDDD7] shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900">EWA Loan Status Distribution</h3>
-              <p className="text-xs text-slate-500">Live active loans by grace and recovery phase</p>
+              <h3 className="text-sm font-bold text-[#30332F]">Loan Portfolio by Recovery Stage</h3>
+              <p className="text-xs text-[#6B706A]">Current distribution across grace, overdue, and repaid states</p>
             </div>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
-              1,495 Total Loans
+            <span className="text-xs font-medium px-2 py-0.5 rounded bg-[#F0F1EC] text-[#6B706A] border border-[#DCDDD7]">
+              1,495 Total
             </span>
           </div>
 
-          <div className="h-[260px]">
+          <div className="h-[240px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={loanStatusData} cx="50%" cy="50%" innerRadius={70} outerRadius={105} paddingAngle={4} dataKey="value">
+                <Pie data={loanStatusData} cx="50%" cy="50%" innerRadius={65} outerRadius={95} paddingAngle={3} dataKey="value">
                   {loanStatusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: any) => [`${value} Loans`, 'Count']} />
+                <Tooltip
+                  formatter={(value: any) => [`${value} Loans`, 'Count']}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DCDDD7', borderRadius: '8px', fontSize: '12px' }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 mt-4 text-xs font-medium text-slate-600 pt-3 border-t border-slate-100">
+          <div className="grid grid-cols-2 gap-2 mt-3 text-xs font-medium text-[#6B706A] pt-3 border-t border-[#DCDDD7]/60">
             {loanStatusData.map((item) => (
               <div key={item.name} className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                <div className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: item.color }} />
                 <span className="truncate">{item.name}</span>
-                <span className="font-bold text-slate-900 ml-auto">{item.value}</span>
+                <span className="font-semibold text-[#30332F] ml-auto">{item.value}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Right Chart: Multi-Platform Worker Distribution */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+        <div className="bg-white p-5 rounded-xl border border-[#DCDDD7] shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900">Multi-Platform Ingest Coverage</h3>
-              <p className="text-xs text-slate-500">Active workers connected across multiple gig platforms</p>
+              <h3 className="text-sm font-bold text-[#30332F]">Platform Connection Distribution</h3>
+              <p className="text-xs text-[#6B706A]">Active verified gig employer syncs across workforce</p>
             </div>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200/60">
+            <span className="text-xs font-medium px-2 py-0.5 rounded bg-[#E9EFEA] text-[#526A57] border border-[#DCDDD7]">
               1,700 Syncs
             </span>
           </div>
 
-          <div className="h-[260px]">
+          <div className="h-[240px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={platformData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                <XAxis dataKey="name" tickLine={false} axisLine={{ stroke: '#E2E8F0' }} tick={{ fill: '#64748B', fontSize: 12 }} />
-                <YAxis tickLine={false} axisLine={false} tick={{ fill: '#64748B', fontSize: 12 }} />
-                <Tooltip cursor={{ fill: '#F1F5F9' }} />
-                <Bar dataKey="users" radius={[8, 8, 0, 0]}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#EAEBE6" />
+                <XAxis dataKey="name" tickLine={false} axisLine={{ stroke: '#DCDDD7' }} tick={{ fill: '#6B706A', fontSize: 11 }} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fill: '#6B706A', fontSize: 11 }} />
+                <Tooltip
+                  cursor={{ fill: '#F0F1EC' }}
+                  contentStyle={{ backgroundColor: '#FFFFFF', borderColor: '#DCDDD7', borderRadius: '8px', fontSize: '12px' }}
+                />
+                <Bar dataKey="users" radius={[4, 4, 0, 0]}>
                   {platformData.map((entry, index) => (
                     <Cell key={`bar-${index}`} fill={entry.fill} />
                   ))}
@@ -195,11 +199,11 @@ const DashboardPage = () => {
             </ResponsiveContainer>
           </div>
 
-          <div className="grid grid-cols-4 gap-2 mt-4 text-center text-xs font-medium pt-3 border-t border-slate-100">
+          <div className="grid grid-cols-4 gap-2 mt-3 text-center text-xs font-medium pt-3 border-t border-[#DCDDD7]/60">
             {platformData.map((item) => (
-              <div key={item.name} className="p-1.5 rounded-lg bg-slate-50">
-                <div className="text-[11px] text-slate-500">{item.name}</div>
-                <div className="font-bold text-slate-900">{item.users}</div>
+              <div key={item.name} className="p-1.5 rounded bg-[#F9F9F7] border border-[#DCDDD7]/60">
+                <div className="text-[10px] text-[#6B706A]">{item.name}</div>
+                <div className="font-semibold text-[#30332F]">{item.users}</div>
               </div>
             ))}
           </div>
@@ -207,48 +211,48 @@ const DashboardPage = () => {
       </div>
 
       {/* System Alerts Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+      <div className="bg-white rounded-xl border border-[#DCDDD7] shadow-xs overflow-hidden">
+        <div className="p-5 border-b border-[#DCDDD7] flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-slate-900">Recent Platform & Risk Events</h3>
-            <p className="text-xs text-slate-500">Live signals from cross-platform background jobs</p>
+            <h3 className="text-sm font-bold text-[#30332F]">Recent Operational & Compliance Events</h3>
+            <p className="text-xs text-[#6B706A]">System records from multi-platform sync and repayment monitoring</p>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-slate-600">
-            <thead className="text-xs text-slate-400 uppercase bg-slate-50/70 border-b border-slate-100">
+          <table className="w-full text-xs text-left text-[#6B706A]">
+            <thead className="text-[11px] text-[#6B706A] uppercase bg-[#F0F1EC] border-b border-[#DCDDD7]">
               <tr>
-                <th className="px-6 py-3.5 font-semibold">Timestamp</th>
-                <th className="px-6 py-3.5 font-semibold">Event Type</th>
-                <th className="px-6 py-3.5 font-semibold">Details</th>
-                <th className="px-6 py-3.5 font-semibold">Action / Status</th>
+                <th className="px-5 py-3 font-semibold">Timestamp</th>
+                <th className="px-5 py-3 font-semibold">Event Type</th>
+                <th className="px-5 py-3 font-semibold">Details</th>
+                <th className="px-5 py-3 font-semibold">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
-              <tr className="hover:bg-slate-50/50 transition">
-                <td className="px-6 py-4 text-xs font-mono text-slate-400">12 mins ago</td>
-                <td className="px-6 py-4 font-semibold text-slate-900">Grace Period Reminder</td>
-                <td className="px-6 py-4 text-xs">Pushed Day 3 reminder to Ramesh Kumar (₹3,000 active loan)</td>
-                <td className="px-6 py-4">
+            <tbody className="divide-y divide-[#DCDDD7]">
+              <tr className="hover:bg-[#F9F9F7] transition-colors">
+                <td className="px-5 py-3.5 font-mono text-[#8A8F89]">12 mins ago</td>
+                <td className="px-5 py-3.5 font-semibold text-[#30332F]">Grace Period Notice</td>
+                <td className="px-5 py-3.5">Day 3 reminder dispatched to Ramesh Kumar (₹3,000 active balance)</td>
+                <td className="px-5 py-3.5">
                   <StatusBadge status="grace_period" type="loan" />
                 </td>
               </tr>
-              <tr className="hover:bg-slate-50/50 transition">
-                <td className="px-6 py-4 text-xs font-mono text-slate-400">45 mins ago</td>
-                <td className="px-6 py-4 font-semibold text-slate-900">Platform Link Sync</td>
-                <td className="px-6 py-4 text-xs">Successfully synced 64 records across Zomato, Swiggy, Uber</td>
-                <td className="px-6 py-4">
-                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                    Synced
+              <tr className="hover:bg-[#F9F9F7] transition-colors">
+                <td className="px-5 py-3.5 font-mono text-[#8A8F89]">45 mins ago</td>
+                <td className="px-5 py-3.5 font-semibold text-[#30332F]">Platform Link Ingest</td>
+                <td className="px-5 py-3.5">Synced 64 earnings and incentive records across Zomato, Swiggy, Uber</td>
+                <td className="px-5 py-3.5">
+                  <span className="text-[11px] font-medium text-[#62806A] bg-[#E9EFEA] px-2 py-0.5 rounded border border-[#DCDDD7]">
+                    Completed
                   </span>
                 </td>
               </tr>
-              <tr className="hover:bg-slate-50/50 transition">
-                <td className="px-6 py-4 text-xs font-mono text-slate-400">2 hours ago</td>
-                <td className="px-6 py-4 font-semibold text-slate-900">Fuel Surge Alert</td>
-                <td className="px-6 py-4 text-xs">Priya Sharma's fuel spending is +25% above 4-week moving average</td>
-                <td className="px-6 py-4">
+              <tr className="hover:bg-[#F9F9F7] transition-colors">
+                <td className="px-5 py-3.5 font-mono text-[#8A8F89]">2 hours ago</td>
+                <td className="px-5 py-3.5 font-semibold text-[#30332F]">Expense Volatility Signal</td>
+                <td className="px-5 py-3.5">Priya Sharma fuel expenditure flagged at +25% above 4-week baseline</td>
+                <td className="px-5 py-3.5">
                   <StatusBadge status="caution" type="risk" />
                 </td>
               </tr>

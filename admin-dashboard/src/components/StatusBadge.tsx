@@ -10,18 +10,18 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'loan' }) => {
     const s = status.toLowerCase();
     
     if (type === 'loan') {
-      if (['grace_period', 'active'].includes(s)) return 'bg-blue-100 text-blue-800';
-      if (['repaid', 'completed'].includes(s)) return 'bg-green-100 text-green-800';
-      if (['overdue'].includes(s)) return 'bg-red-100 text-red-800';
-      if (['rolled_over'].includes(s)) return 'bg-orange-100 text-orange-800';
-      if (['blocked'].includes(s)) return 'bg-gray-100 text-gray-800';
+      if (['grace_period', 'active'].includes(s)) return 'bg-[#F6EFE5] text-[#A78655] border-[#DCDDD7]';
+      if (['repaid', 'completed'].includes(s)) return 'bg-[#E9EFEA] text-[#62806A] border-[#DCDDD7]';
+      if (['overdue'].includes(s)) return 'bg-[#F8EDEB] text-[#A96861] border-[#DCDDD7]';
+      if (['rolled_over'].includes(s)) return 'bg-[#F0F1EC] text-[#7C8768] border-[#DCDDD7]';
+      if (['blocked'].includes(s)) return 'bg-[#F0F1EC] text-[#6B706A] border-[#DCDDD7]';
     } else if (type === 'risk') {
-      if (s === 'safe') return 'bg-green-100 text-green-800';
-      if (s === 'caution') return 'bg-yellow-100 text-yellow-800';
-      if (s === 'high_risk') return 'bg-red-100 text-red-800';
+      if (s === 'safe') return 'bg-[#E9EFEA] text-[#62806A] border-[#DCDDD7]';
+      if (s === 'caution') return 'bg-[#F6EFE5] text-[#A78655] border-[#DCDDD7]';
+      if (s === 'high_risk') return 'bg-[#F8EDEB] text-[#A96861] border-[#DCDDD7]';
     }
     
-    return 'bg-gray-100 text-gray-800';
+    return 'bg-[#F0F1EC] text-[#6B706A] border-[#DCDDD7]';
   };
 
   const formatText = (text: string) => {
@@ -29,7 +29,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'loan' }) => {
   };
 
   return (
-    <span className={`px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStyles()}`}>
+    <span className={`px-2 py-0.5 inline-flex text-xs font-medium rounded-md border ${getStyles()}`}>
       {formatText(status)}
     </span>
   );

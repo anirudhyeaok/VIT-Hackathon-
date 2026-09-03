@@ -12,7 +12,7 @@ import { ToastProvider } from './components/Toast';
 function App() {
   return (
     <ToastProvider>
-      <div className="flex h-screen overflow-hidden bg-gray-50">
+      <div className="flex h-screen overflow-hidden bg-canvas text-content-primary">
         <Sidebar />
         <div className="flex-1 overflow-y-auto">
           <main className="p-8">

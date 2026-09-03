@@ -19,8 +19,8 @@ const UsersPage = () => {
         setUsers(res.data);
         setLoading(false);
       })
-      .catch((err) => {
-        addToast("Failed to fetch users.", "error");
+      .catch(() => {
+        addToast("Failed to fetch user directory.", "error");
         setLoading(false);
       });
   }, [addToast]);
@@ -33,25 +33,28 @@ const UsersPage = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Users Management</h1>
-        <div className="flex gap-4 items-center">
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-[#30332F]">Gig Worker Registry</h1>
+          <p className="text-xs text-[#6B706A] mt-0.5">Active worker profiles, multi-platform integrations, and resilience ratings.</p>
+        </div>
+        <div className="flex gap-2.5 items-center w-full sm:w-auto">
           <button 
             onClick={() => setRevealSensitive(!revealSensitive)}
-            className="flex items-center text-sm text-gray-600 hover:text-primary-600 bg-white border border-gray-200 px-3 py-1.5 rounded-md shadow-sm"
+            className="flex items-center text-xs text-[#6B706A] hover:text-[#30332F] bg-white border border-[#DCDDD7] px-3 py-1.5 rounded-lg shadow-xs transition-colors shrink-0"
           >
-            {revealSensitive ? <EyeOff size={16} className="mr-2"/> : <Eye size={16} className="mr-2"/>}
-            {revealSensitive ? 'Mask Data' : 'Reveal Data'}
+            {revealSensitive ? <EyeOff size={14} className="mr-1.5 text-[#5F7563]"/> : <Eye size={14} className="mr-1.5 text-[#5F7563]"/>}
+            {revealSensitive ? 'Mask PII' : 'Reveal PII'}
           </button>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={18} className="text-gray-400" />
+          <div className="relative w-full sm:w-64">
+            <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+              <Search size={14} className="text-[#8A8F89]" />
             </div>
             <input
               type="text"
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm"
-              placeholder="Search users..."
+              className="pl-8 pr-3 py-1.5 border border-[#DCDDD7] bg-white rounded-lg text-xs text-[#30332F] placeholder-[#8A8F89] focus:outline-none focus:border-[#5F7563] block w-full"
+              placeholder="Search by worker name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -59,49 +62,61 @@ const UsersPage = () => {
         </div>
       </div>
 
-      <div className="card overflow-hidden p-0 min-h-[300px]">
+      <div className="bg-white rounded-xl border border-[#DCDDD7] shadow-xs overflow-hidden">
         {loading ? (
-          <div className="p-8 space-y-4">
-            <div className="h-12 bg-gray-200 rounded animate-pulse w-full"></div>
-            <div className="h-12 bg-gray-200 rounded animate-pulse w-full"></div>
-            <div className="h-12 bg-gray-200 rounded animate-pulse w-full"></div>
+          <div className="p-8 space-y-3">
+            <div className="h-8 bg-[#F0F1EC] rounded animate-pulse w-full"></div>
+            <div className="h-8 bg-[#F0F1EC] rounded animate-pulse w-full"></div>
+            <div className="h-8 bg-[#F0F1EC] rounded animate-pulse w-full"></div>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+            <table className="w-full text-xs text-left text-[#6B706A]">
+              <thead className="text-[11px] text-[#6B706A] uppercase bg-[#F0F1EC] border-b border-[#DCDDD7]">
                 <tr>
-                  <th className="px-6 py-4">User</th>
-                  <th className="px-6 py-4">Occupation</th>
-                  <th className="px-6 py-4">Linked Platforms</th>
-                  <th className="px-6 py-4">Resilience Score</th>
-                  <th className="px-6 py-4">Active Loans</th>
-                  <th className="px-6 py-4">Status</th>
+                  <th className="px-5 py-3 font-semibold">Beneficiary Name</th>
+                  <th className="px-5 py-3 font-semibold">Primary Occupation</th>
+                  <th className="px-5 py-3 font-semibold">Integrated Platforms</th>
+                  <th className="px-5 py-3 font-semibold">Resilience Score</th>
+                  <th className="px-5 py-3 font-semibold">Active EWA Loans</th>
+                  <th className="px-5 py-3 font-semibold">Account Status</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-[#DCDDD7]">
                 {filteredUsers.map((user) => (
-                  <tr key={user.id} onClick={() => navigate(`/admin/users/${user.id}`)} className="border-b hover:bg-gray-50 cursor-pointer transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-900">{user.name}</div>
-                      <div className="text-gray-500 text-xs">
+                  <tr 
+                    key={user.id} 
+                    onClick={() => navigate(`/admin/users/${user.id}`)} 
+                    className="hover:bg-[#F9F9F7] cursor-pointer transition-colors"
+                  >
+                    <td className="px-5 py-3.5">
+                      <div className="font-semibold text-[#30332F]">{user.name}</div>
+                      <div className="text-[#8A8F89] text-[11px] font-mono mt-0.5">
                         {revealSensitive ? user.email : maskEmail(user.email)}
                       </div>
                     </td>
-                    <td className="px-6 py-4">{user.occupation}</td>
-                    <td className="px-6 py-4 font-medium">{user.platforms}</td>
-                    <td className="px-6 py-4">
-                      <span className={`font-bold ${user.resilienceScore >= 70 ? 'text-green-600' : user.resilienceScore >= 40 ? 'text-yellow-600' : 'text-red-600'}`}>
-                        {user.resilienceScore}
+                    <td className="px-5 py-3.5 text-[#30332F]">{user.occupation}</td>
+                    <td className="px-5 py-3.5 font-medium text-[#30332F]">{user.platforms}</td>
+                    <td className="px-5 py-3.5 font-bold">
+                      <span className={`px-2 py-0.5 rounded text-xs ${
+                        user.resilienceScore >= 70 
+                          ? 'bg-[#E9EFEA] text-[#62806A] border border-[#DCDDD7]' 
+                          : user.resilienceScore >= 40 
+                          ? 'bg-[#F6EFE5] text-[#A78655] border border-[#DCDDD7]' 
+                          : 'bg-[#F8EDEB] text-[#A96861] border border-[#DCDDD7]'
+                      }`}>
+                        {user.resilienceScore} / 100
                       </span>
                     </td>
-                    <td className="px-6 py-4">{user.activeLoans}</td>
-                    <td className="px-6 py-4"><StatusBadge status={user.status} type="loan" /></td>
+                    <td className="px-5 py-3.5 font-semibold text-[#30332F]">{user.activeLoans}</td>
+                    <td className="px-5 py-3.5">
+                      <StatusBadge status={user.status} type="loan" />
+                    </td>
                   </tr>
                 ))}
                 {filteredUsers.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">No users found.</td>
+                    <td colSpan={6} className="px-6 py-8 text-center text-[#6B706A]">No worker records found.</td>
                   </tr>
                 )}
               </tbody>

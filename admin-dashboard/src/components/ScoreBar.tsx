@@ -9,18 +9,18 @@ interface ScoreBarProps {
 const ScoreBar: React.FC<ScoreBarProps> = ({ score, max = 100, label }) => {
   const percentage = Math.min(100, Math.max(0, (score / max) * 100));
   
-  let color = 'bg-red-500';
-  if (percentage >= 70) color = 'bg-green-500';
-  else if (percentage >= 40) color = 'bg-yellow-500';
+  let color = 'bg-[#A96861]';
+  if (percentage >= 70) color = 'bg-[#5F7563]';
+  else if (percentage >= 40) color = 'bg-[#A78655]';
 
   return (
-    <div className="mb-4">
-      <div className="flex justify-between text-sm mb-1">
-        <span className="font-medium text-gray-700">{label}</span>
-        <span className="font-bold">{score}/{max}</span>
+    <div className="mb-3.5">
+      <div className="flex justify-between text-xs mb-1">
+        <span className="font-medium text-[#30332F]">{label}</span>
+        <span className="font-bold font-mono text-[#30332F]">{score} / {max}</span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <div className={`h-2.5 rounded-full ${color}`} style={{ width: `${percentage}%` }}></div>
+      <div className="w-full bg-[#F0F1EC] rounded-full h-2 border border-[#DCDDD7]">
+        <div className={`h-2 rounded-full transition-all ${color}`} style={{ width: `${percentage}%` }}></div>
       </div>
     </div>
   );
