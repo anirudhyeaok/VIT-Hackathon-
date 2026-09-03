@@ -15,7 +15,7 @@ function App() {
       <div className="flex h-screen overflow-hidden bg-canvas text-content-primary">
         <Sidebar />
         <div className="flex-1 overflow-y-auto">
-          <main className="p-8">
+          <main className="p-10 max-w-7xl mx-auto w-full">
             <Routes>
               <Route path="/" element={<Navigate to="/admin" replace />} />
               <Route path="/admin" element={<DashboardPage />} />

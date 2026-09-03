@@ -12,22 +12,22 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend }) => {
   return (
-    <div className="bg-white rounded-xl border border-[#DCDDD7] p-5 shadow-xs">
-      <div className="flex items-center justify-between">
+    <div className="bg-white rounded-xl border border-[#DCDDD7] p-6 shadow-xs flex flex-col justify-between">
+      <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium text-[#6B706A] mb-1">{title}</p>
-          <h3 className="text-2xl font-bold text-[#30332F] tracking-tight">{value}</h3>
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#6B706A] mb-1.5">{title}</p>
+          <h3 className="text-3xl font-bold text-[#30332F] tracking-tight">{value}</h3>
         </div>
-        <div className="p-2.5 bg-[#F0F1EC] text-[#5F7563] rounded-lg border border-[#DCDDD7]/60">
+        <div className="p-3 bg-[#F0F1EC] text-[#5F7563] rounded-xl border border-[#DCDDD7]">
           {icon}
         </div>
       </div>
       {trend && (
-        <div className="mt-3 flex items-center text-xs">
+        <div className="mt-4 flex items-center text-xs">
           <span className={`font-semibold ${trend.isPositive ? 'text-[#62806A]' : 'text-[#A96861]'}`}>
-            {trend.isPositive ? '+' : '-'}{Math.abs(trend.value)}%
+            {trend.isPositive ? '↑ +' : '↓ -'}{Math.abs(trend.value)}%
           </span>
-          <span className="text-[#6B706A] ml-1.5">vs last month</span>
+          <span className="text-[#8A8F89] ml-2">vs last cycle</span>
         </div>
       )}
     </div>
