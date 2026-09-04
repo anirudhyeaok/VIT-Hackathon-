@@ -5,7 +5,7 @@
 
 ---
 
-## 🌟 The 4 Core Differentiators (Why We Beat KarmaLife)
+## 🌟 The 4 Core Differentiators 
 
 Traditional apps like **KarmaLife** provide Earned Wage Access (EWA) and micro-credit, but have critical structural flaws for real-world gig workers. **GigWallet solves all four:**
 
