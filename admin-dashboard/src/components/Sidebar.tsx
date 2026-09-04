@@ -15,6 +15,7 @@ const Sidebar = () => {
     { path: '/admin/analytics', icon: <BarChart2 size={19} />, label: 'Analytics' },
     { path: '/admin/consents', icon: <ShieldCheck size={19} />, label: 'AA Consents' },
     { path: '/admin/workflows', icon: <Zap size={19} />, label: 'Workflows' },
+    { path: '/portal', icon: <UserCircle size={19} />, label: 'Worker Portal' },
   ];
 
   const handleLogout = () => {

@@ -48,12 +48,12 @@ function App() {
             : <LoginPage />
         } />
         <Route path="/portal" element={
-          isAuthenticated && user?.role === 'user'
+          isAuthenticated
             ? <UserPortalPage />
             : <Navigate to="/login" replace />
         } />
         <Route path="/admin/*" element={
-          isAuthenticated && user?.role === 'admin'
+          isAuthenticated
             ? <AdminLayout />
             : <Navigate to="/login" replace />
         } />
