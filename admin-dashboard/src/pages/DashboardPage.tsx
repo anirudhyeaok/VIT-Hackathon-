@@ -33,14 +33,14 @@ const DashboardPage = () => {
   return (
     <div className="space-y-10 pb-16">
       {/* Spacious Open Header (Zero Congestion) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-[#DCDDD7]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-[#DCDDD7] dark:border-[#3A3D3A]">
         <div className="space-y-1.5">
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#E9EFEA] text-[#526A57] text-xs font-semibold">
             <span>Operational Telemetry</span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#5F7563]"></span>
             <span>All 4 Systems Active</span>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-[#30332F]">
+          <h1 className="text-3xl font-bold tracking-tight text-[#30332F] dark:text-[#E5E7E3]">
             Resilience & Portfolio Overview
           </h1>
           <p className="text-sm text-[#6B706A]">
@@ -74,7 +74,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Spacious 5-Stage Deferred Recovery Flow */}
-      <div className="bg-white rounded-xl border border-[#DCDDD7] p-8 shadow-xs space-y-6">
+      <div className="bg-white dark:bg-[#242624] rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] p-8 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-[#F0F1EC] text-[#5F7563] flex items-center justify-center border border-[#DCDDD7]">
@@ -130,12 +130,12 @@ const DashboardPage = () => {
             <p className="text-xs text-[#6B706A] leading-relaxed">Unpaid balance rolled into next cycle.</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[#F9F9F7] border border-[#DCDDD7] space-y-2">
+          <div className="p-4 rounded-xl bg-[#F8EDEB] border border-[#DCDDD7] space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-[#8A8F89] uppercase tracking-wider">Step 5</span>
+              <span className="text-[10px] font-bold text-[#A96861] uppercase tracking-wider">Step 5</span>
             </div>
-            <div className="text-sm font-bold text-[#30332F]">Fair Restriction</div>
-            <p className="text-xs text-[#6B706A] leading-relaxed">Advances paused only after 2 cycles.</p>
+            <div className="text-sm font-bold text-[#30332F]">Penalty Escalation</div>
+            <p className="text-xs text-[#A96861] leading-relaxed">+5% compounding per cycle. Account stays active.</p>
           </div>
         </div>
       </div>
@@ -143,7 +143,7 @@ const DashboardPage = () => {
       {/* Main Charts Section with Generous Padding and Gap */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Chart */}
-        <div className="bg-white p-7 rounded-xl border border-[#DCDDD7] shadow-xs space-y-6">
+        <div className="bg-white dark:bg-[#242624] p-7 rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] shadow-xs space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-[#30332F]">Loan Portfolio by Lifecycle</h3>
@@ -184,7 +184,7 @@ const DashboardPage = () => {
         </div>
 
         {/* Right Chart */}
-        <div className="bg-white p-7 rounded-xl border border-[#DCDDD7] shadow-xs space-y-6">
+        <div className="bg-white dark:bg-[#242624] p-7 rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] shadow-xs space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-[#30332F]">Platform Integrations</h3>
@@ -226,7 +226,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Spacious System Events Table */}
-      <div className="bg-white rounded-xl border border-[#DCDDD7] shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-[#242624] rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] shadow-xs overflow-hidden">
         <div className="p-7 border-b border-[#DCDDD7]">
           <h3 className="text-base font-bold text-[#30332F]">Recent Operational Audit Events</h3>
           <p className="text-xs text-[#6B706A] mt-0.5">Automated logs from cross-platform background sync and borrower notifications</p>

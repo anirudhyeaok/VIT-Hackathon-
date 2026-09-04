@@ -46,7 +46,9 @@ export class LoansService {
       } else if (loan.status === 'overdue') {
         nextEscalation = `Will rollover at month end`;
       } else if (loan.status === 'rolled_over') {
-        nextEscalation = `Warning: Next failure will result in account block`;
+        nextEscalation = `Continued non-payment will increase penalty by 5% per cycle`;
+      } else if (loan.status === 'penalty_escalated') {
+        nextEscalation = `Penalty compounding active (+5% per cycle). Repayment still accepted.`;
       }
 
       return {

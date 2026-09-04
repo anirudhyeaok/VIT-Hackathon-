@@ -222,6 +222,60 @@ app.get('/ola/earnings/:workerId', (req, res) => {
   });
 });
 
+// ─── Admin Summary Endpoints (for Workflow Pipeline Tests) ────────────────────
+app.get('/admin/loans', (_req, res) => {
+  res.json({
+    summary: {
+      total: 420,
+      disbursed: 180,
+      grace_period: 120,
+      overdue: 65,
+      rolled_over: 40,
+      penalty_escalated: 15,
+      repaid: 890
+    },
+    recentLoans: [
+      { id: 'L-1001', userId: 'U-001', userName: 'Rahul Sharma', amount: 5000, status: 'grace_period', graceDeadline: '2026-09-10' },
+      { id: 'L-1002', userId: 'U-002', userName: 'Priya Singh', amount: 2000, status: 'disbursed', graceDeadline: '2026-09-12' },
+      { id: 'L-1003', userId: 'U-003', userName: 'Amit Kumar', amount: 12000, status: 'overdue', graceDeadline: '2026-09-01' },
+    ],
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/admin/users', (_req, res) => {
+  res.json({
+    summary: {
+      totalUsers: 1245,
+      activeUsers: 1095,
+      blockedUsers: 150,
+      avgResilienceScore: 72
+    },
+    recentUsers: [
+      { id: 'U-001', name: 'Rahul Sharma', platforms: 3, resilienceScore: 78, status: 'active' },
+      { id: 'U-002', name: 'Priya Singh', platforms: 2, resilienceScore: 65, status: 'active' },
+      { id: 'U-003', name: 'Amit Kumar', platforms: 1, resilienceScore: 42, status: 'active' },
+    ],
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.get('/admin/analytics', (_req, res) => {
+  res.json({
+    metrics: {
+      totalDisbursed: 4520000,
+      repaymentRate: 0.87,
+      avgGraceDays: 3.2,
+      platformSyncHealth: 0.92
+    },
+    alerts: [
+      { type: 'volatility', message: 'Fuel expenses up 25% for 12 users', severity: 'warning' },
+      { type: 'platform', message: 'Ola sync stale for 30 accounts', severity: 'info' }
+    ],
+    timestamp: new Date().toISOString()
+  });
+});
+
 // ─── Health Check ────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {
   res.json({

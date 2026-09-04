@@ -29,7 +29,7 @@ const LoansPage = () => {
     { id: 'grace_period', label: 'Grace Period (5d)' },
     { id: 'overdue', label: 'Overdue' },
     { id: 'rolled_over', label: 'Rolled Over' },
-    { id: 'blocked', label: 'Restricted' },
+    { id: 'penalty_escalated', label: 'Penalty Escalated' },
   ];
 
   const pipeline = [
@@ -37,20 +37,20 @@ const LoansPage = () => {
     { status: 'grace_period', label: '5-Day Grace', count: loans.filter(l => l.status === 'grace_period').length, style: 'bg-[#E9EFEA] text-[#526A57] border-[#5F7563]/50' },
     { status: 'overdue', label: 'Overdue', count: loans.filter(l => l.status === 'overdue').length, style: 'bg-[#F8EDEB] text-[#A96861] border-[#DCDDD7]' },
     { status: 'rolled_over', label: 'Rolled Over', count: loans.filter(l => l.status === 'rolled_over').length, style: 'bg-[#F6EFE5] text-[#A78655] border-[#DCDDD7]' },
-    { status: 'blocked', label: 'Restricted', count: loans.filter(l => l.status === 'blocked').length, style: 'bg-[#F0F1EC] text-[#6B706A] border-[#DCDDD7]' },
+    { status: 'penalty_escalated', label: 'Penalty (+5%)', count: loans.filter(l => l.status === 'penalty_escalated').length, style: 'bg-[#F8EDEB] text-[#A96861] border-[#DCDDD7]' },
   ];
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div>
-        <h1 className="text-xl font-bold text-[#30332F]">Loan Portfolio & Grace Management</h1>
-        <p className="text-xs text-[#6B706A] mt-1">
+        <h1 className="text-xl font-bold text-[#30332F] dark:text-[#E5E7E3]">Loan Portfolio & Grace Management</h1>
+        <p className="text-xs text-[#6B706A] dark:text-[#A3A8A2] mt-1">
           Escalation tracking: Disbursed wages maintain a 5-day grace window before rollover and account restrictions.
         </p>
       </div>
 
       {/* Escalation Funnel */}
-      <div className="bg-white rounded-xl border border-[#DCDDD7] p-5 shadow-xs">
+      <div className="bg-white dark:bg-[#242624] rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] p-5 shadow-xs">
         <h3 className="text-xs font-bold uppercase tracking-wider text-[#6B706A] mb-3">Portfolio Escalation Funnel</h3>
         <div className="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3 overflow-x-auto pb-2">
           {pipeline.map((stage, idx) => (
@@ -90,7 +90,7 @@ const LoansPage = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-[#DCDDD7] shadow-xs overflow-hidden">
+      <div className="bg-white dark:bg-[#242624] rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] shadow-xs overflow-hidden">
         {loading ? (
           <div className="p-8 space-y-3">
             <div className="h-8 bg-[#F0F1EC] rounded animate-pulse w-full"></div>

@@ -43,7 +43,7 @@ export const getLoans = async () => {
     { id: 101, userId: 1, userName: 'Rahul Sharma', amount: 5000, status: 'grace_period', riskLevel: 'safe', disbursedDate: '2023-10-01', graceDeadline: '2023-10-08', repaidAmount: 0 },
     { id: 102, userId: 3, userName: 'Amit Kumar', amount: 12000, status: 'overdue', riskLevel: 'high_risk', disbursedDate: '2023-09-15', graceDeadline: '2023-09-22', repaidAmount: 2000 },
     { id: 103, userId: 4, userName: 'Vikram Patel', amount: 8000, status: 'rolled_over', riskLevel: 'caution', disbursedDate: '2023-08-10', graceDeadline: '2023-08-17', repaidAmount: 1000 },
-    { id: 104, userId: 5, userName: 'Suresh Raina', amount: 15000, status: 'blocked', riskLevel: 'high_risk', disbursedDate: '2023-07-01', graceDeadline: '2023-07-08', repaidAmount: 0 },
+    { id: 104, userId: 5, userName: 'Suresh Raina', amount: 15000, status: 'penalty_escalated', riskLevel: 'high_risk', disbursedDate: '2023-07-01', graceDeadline: '2023-07-08', repaidAmount: 0, penaltyCycles: 3, penaltyRate: 0.05, originalPrincipal: 15000, totalDue: 17364 },
   ]);
 };
 
@@ -66,7 +66,7 @@ export const getAnalytics = async () => {
       taskCompletionRate: 85,
       recommendationUptake: 42,
       activeUsers: 850,
-      blockedUsers: 150,
+      penaltyEscalatedUsers: 150,
       mostViewedScreens: [{screen: 'Dashboard', views: 5000}, {screen: 'Earnings', views: 3200}, {screen: 'Loans', views: 2100}],
       commonActions: [{action: 'Credit Evaluated', count: 1200}, {action: 'Savings Accepted', count: 800}, {action: 'Profile Updated', count: 450}],
       errorRates: [{date: '10-01', rate: 2.1}, {date: '10-02', rate: 1.8}, {date: '10-03', rate: 3.5}, {date: '10-04', rate: 1.2}]

@@ -14,7 +14,7 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({ status, type = 'loan' }) => {
       if (['repaid', 'completed'].includes(s)) return 'bg-[#E9EFEA] text-[#62806A] border-[#DCDDD7]';
       if (['overdue'].includes(s)) return 'bg-[#F8EDEB] text-[#A96861] border-[#DCDDD7]';
       if (['rolled_over'].includes(s)) return 'bg-[#F0F1EC] text-[#7C8768] border-[#DCDDD7]';
-      if (['blocked'].includes(s)) return 'bg-[#F0F1EC] text-[#6B706A] border-[#DCDDD7]';
+      if (['penalty_escalated'].includes(s)) return 'bg-[#F8EDEB] text-[#A96861] border-[#DCDDD7]';
     } else if (type === 'risk') {
       if (s === 'safe') return 'bg-[#E9EFEA] text-[#62806A] border-[#DCDDD7]';
       if (s === 'caution') return 'bg-[#F6EFE5] text-[#A78655] border-[#DCDDD7]';

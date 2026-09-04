@@ -44,28 +44,28 @@ const AnalyticsPage = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       <div>
-        <h1 className="text-xl font-bold text-[#30332F]">Cross-Platform Operations & Usability Analytics</h1>
-        <p className="text-xs text-[#6B706A] mt-0.5">Reliability, aggregation metrics, and platform health telemetry.</p>
+        <h1 className="text-xl font-bold text-[#30332F] dark:text-[#E5E7E3]">Cross-Platform Operations & Usability Analytics</h1>
+        <p className="text-xs text-[#6B706A] dark:text-[#A3A8A2] mt-0.5">Reliability, aggregation metrics, and platform health telemetry.</p>
       </div>
 
       {/* Usability & Portfolio KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-[#DCDDD7] shadow-xs">
+        <div className="bg-white dark:bg-[#242624] p-4 rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] shadow-xs">
           <p className="text-[#6B706A] text-xs font-medium mb-1">Task Completion Rate</p>
           <h3 className="text-2xl font-bold text-[#30332F]">{data.usability.taskCompletionRate}%</h3>
           <p className="text-[11px] text-[#62806A] font-medium mt-1">↑ 5% positive trend</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-[#DCDDD7] shadow-xs">
+        <div className="bg-white dark:bg-[#242624] p-4 rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] shadow-xs">
           <p className="text-[#6B706A] text-xs font-medium mb-1">Recommendation Uptake</p>
           <h3 className="text-2xl font-bold text-[#30332F]">{data.usability.recommendationUptake}%</h3>
           <p className="text-[11px] text-[#6B706A] mt-1">Safe-to-save adoption</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-[#DCDDD7] shadow-xs">
+        <div className="bg-white dark:bg-[#242624] p-4 rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] shadow-xs">
           <p className="text-[#6B706A] text-xs font-medium mb-1">Portfolio Resilience Score</p>
           <h3 className="text-2xl font-bold text-[#30332F]">{data.stats.avgScore} / 100</h3>
           <p className="text-[11px] text-[#6B706A] mt-1">Aggregated mean</p>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-[#DCDDD7] shadow-xs">
+        <div className="bg-white dark:bg-[#242624] p-4 rounded-xl border border-[#DCDDD7] dark:border-[#3A3D3A] shadow-xs">
           <p className="text-[#6B706A] text-xs font-medium mb-1">Active vs Restricted</p>
           <h3 className="text-2xl font-bold text-[#30332F]">
             {data.usability.activeUsers} <span className="text-[#8A8F89] text-base font-normal">/</span> {data.usability.blockedUsers}
